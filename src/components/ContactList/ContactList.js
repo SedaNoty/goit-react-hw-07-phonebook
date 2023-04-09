@@ -1,28 +1,31 @@
 import css from './ContactList.module.css';
 import { useDispatch, useSelector } from 'react-redux';
-import { deleteContacts, stateContacts } from 'redux/contactSlice';
-import { stateFilter } from 'redux/filterSlice';
+import { deleteContact } from 'redux/operations';
+import { getStateContacts, getStateFilter } from 'redux/selectors';
 
 const ContactList = () => {
-    const arrContacts = useSelector(stateContacts);
-    const filterValue = useSelector(stateFilter);
-    const dispatch = useDispatch();
+    const contactsList = useSelector(getStateContacts);
+    const filterValue = useSelector(getStateFilter);
+    const dispatch = useDispatch();    
 
     const getFilterContact = () => {
-        if (filterValue === '') return arrContacts;
-        return arrContacts.filter(contact => {
-            return contact.name.toLowerCase().includes(filterValue.toLowerCase());
-        });
+        if (filterValue === '') {
+            return contactsList;
+        };
+        const normalizedFilter = filterValue.toLowerCase();
+        return contactsList.filter(contact =>
+            contact.name.toLowerCase().includes(normalizedFilter)
+        );
     };
 
-    const filterArrayContacts = getFilterContact();
+    const filterContacts = getFilterContact();
     
     return (
         <ul>
-            {filterArrayContacts?.map(({ id, name, number }) => (
+            {filterContacts?.map(({ id, name, phone }) => (
                     <li key={id} className={css.item}>
-                        {name}: {number}
-                        <button type='submit' className={css.button_contact} onClick={() => dispatch(deleteContacts(id))}>Delete</button>
+                        {name}:<br/> {phone}
+                        <button type='submit' className={css.button_del} onClick={() => dispatch(deleteContact(id))}>Delete</button>
                     </li>
                 ))}
         </ul>
